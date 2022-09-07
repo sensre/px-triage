@@ -1,0 +1,16 @@
+#!/bin/bash
+
+function build {
+    echo ${1:?Not Found}
+    docker build -t sens/${1}:latest -f ${1}.dock .
+}
+
+if [ ${1} ]
+then
+    build ${1}
+else
+    for file in *.dock
+    do
+        build $(echo $file | cut -d. -f1)
+    done
+fi
