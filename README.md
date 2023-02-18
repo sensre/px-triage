@@ -12,11 +12,17 @@ PX-TRIAGE is a containerized portworx troubleshooting tools. To build the docker
 
 ### ETCDCTL Commands:
 docker run --rm -e ETCDCTL_API=3 sens/etcdctl --endpoints "http://x.x.x.x1:9019,http://x.x.x.x2:9019,http://x.x.x.x3:9019" member list -w table
+
 docker run --rm -e ETCDCTL_API=3 sens/etcdctl --endpoints "http://x.x.x.x1:9019,http://x.x.x.x2:9019,http://x.x.x.x3:9019" cluster-health
+
 docker run --rm -e ETCDCTL_API=3 sens/etcdctl --endpoints "http://x.x.x.x1:9019,http://x.x.x.x2:9019,http://x.x.x.x3:9019" check perf
+
 docker run --rm -e ETCDCTL_API=3 sens/etcdctl --endpoints "http://x.x.x.x1:9019,http://x.x.x.x2:9019,http://x.x.x.x3:9019" endpoint health -w table
+
 docker run --rm -e ETCDCTL_API=3 sens/etcdctl --endpoints "http://x.x.x.x1:9019,http://x.x.x.x2:9019,http://x.x.x.x3:9019" defrag
+
 docker run --rm -e ETCDCTL_API=3 sens/etcdctl --endpoints "http://x.x.x.x1:9019,http://x.x.x.x2:9019,http://x.x.x.x3:9019" get --prefix pwx/<cluster-id>/cluster
+
 docker run --rm -e ETCDCTL_API=3 sens/etcdctl --endpoints "http://x.x.x.x1:9019,http://x.x.x.x2:9019,http://x.x.x.x3:9019" get --prefix pwx/<cluster-id>/storage/volumes
 
 ### FIO Commands:
@@ -25,21 +31,32 @@ https://docs.portworx.com/operations/operate-other/performance-and-tuning/fio/
 
 
 Benchmarking HowTo
+
 Step 1: Before installing Portworx, benchmark all the disk drives using hdparm or dd. This is the upper bound of all measurements from here on.
+
 Step 2: Install Portworx and get a baseline run. Stop Portworx and mount the disk drive(s) on a mountpoint on the host. Run Fio benchmark using this mountpoint as the target.
+
 Step 3: Verify results. Make sure the IOs are hitting the disk by looking at iostat(1) command. Make sure there are no reads when running write test and vice versa. Compare with results from Step1.
+
 Step 4: Start Portworx, create a volume. Run Fio benchmark with the same options as the baseline using the attached Portworx device as target.
+
 Step 5: Verify results, repeat Step3. Also compare with results from Step2.
 Note the following Results: * Total runtime. * Throughput and IOPS. * Latency (Completion time per request): 90/95th percentile clat.
 
 Fio Options:
 
 * ioengine: Linux native asynchronous IO engine (libaio).
+
 * blocksize: This is the Block size used for each IO operation and varies from application to application.
+
 * readwrite: IO pattern (read/write sequential/random).
+
 * size: This is the dataset size. Ideally should be greater than the size of host cache to avoid any caching effects.
+
 * direct: Set to true for non-buffered IO. This implies files are opened with O_DIRECT flag which results in IOs bypassing host cache.
+
 * iodepth: This is the number of outstanding/queued IO requests in the system. A higher number typically means greater concurrecy and better resource utilization.
+
 * end_fsync: This causes flushing of dirty data to disk at the end of test. The flush time is included in the measurement.
 Additional factors to consider when running a write test: * Do not overwrite. Reusing the same target in repeated tests will end up measuring overwrites instead of appending writes. * Do not include any verify options. Verification will introduce reads in the test.
 
